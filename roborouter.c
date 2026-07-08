@@ -22,19 +22,27 @@ void inicializarGrafo(int n) {
     num_vertices = n;
     // Dica: Crie dois laços 'for' aninhados (i e j) para percorrer a matriz
     // e preencha todos os espaços com 0 (para não ponderado) ou INFINITO (se for focar no Mestre).
+    for (int i = 0; i < MAX_VERTICES; i++)
+        for (int j = 0; j < MAX_VERTICES; j++)
+            grafo[i][j] = 0;
 }
 
 // Função para criar conexão entre cruzamentos do labirinto
 void adicionarAresta(int origem, int destino, int peso) {
     // Dica: Para grafos não direcionados, se A se conecta a B, B se conecta a A.
-    // grafo[origem][destino] = peso;
-    // grafo[destino][origem] = peso;
+    grafo[origem][destino] = peso;
+    grafo[destino][origem] = peso;
 }
 
 // Função para exibir a Matriz
 void imprimirGrafo() {
     printf("--- Representacao do Labirinto (Matriz) ---\n");
     // Dica: Crie laços 'for' aninhados para dar um printf na matriz.
+    for (int i = 0; i < num_vertices; i++){
+        for (int j = 0; j < num_vertices; j++)
+            printf("%d", grafo[i][j]);
+        printf("\n");  
+    }
 }
 
 
@@ -98,12 +106,20 @@ int main() {
     // ---------------------------------------------------------
     
     // Exemplo: Inicializar um grafo com 6 vértices (0 a 5)
-    // inicializarGrafo(6);
+    inicializarGrafo(6);
 
     // Dica: Modele o labirinto do PDF. Exemplo: Vértice 0 ligado ao 1
-    // adicionarAresta(0, 1, 1);
+    adicionarAresta(0, 1, 2);
+    adicionarAresta(0, 4, 5);
+    adicionarAresta(1, 2, 2);
+    adicionarAresta(1, 3, 4);
+    adicionarAresta(1, 4, 1);
+    adicionarAresta(2, 3, 3);
+    adicionarAresta(2, 4, 3);
+    adicionarAresta(3, 5, 1);
+    adicionarAresta(4, 5, 5);
     
-    // imprimirGrafo();
+    imprimirGrafo();
     
 
     // ---------------------------------------------------------
