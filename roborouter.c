@@ -22,9 +22,15 @@ void inicializarGrafo(int n) {
     num_vertices = n;
     // Dica: Crie dois laços 'for' aninhados (i e j) para percorrer a matriz
     // e preencha todos os espaços com 0 (para não ponderado) ou INFINITO (se for focar no Mestre).
-    for (int i = 0; i < MAX_VERTICES; i++)
-        for (int j = 0; j < MAX_VERTICES; j++)
-            grafo[i][j] = 0;
+    for (int i = 0; i < MAX_VERTICES; i++){
+        for (int j = 0; j < MAX_VERTICES; j++){
+        	if (i == j){
+        		grafo[i][j] = 0;
+			} else {
+				grafo[i][j] = INFINITO;
+			}
+		}
+	}
 }
 
 // Função para criar conexão entre cruzamentos do labirinto
@@ -40,7 +46,7 @@ void imprimirGrafo() {
     // Dica: Crie laços 'for' aninhados para dar um printf na matriz.
     for (int i = 0; i < num_vertices; i++){
         for (int j = 0; j < num_vertices; j++)
-            printf("%d", grafo[i][j]);
+            printf("%d ", grafo[i][j]);
         printf("\n");  
     }
 }
@@ -60,39 +66,104 @@ void inicializarVisitados() {
 }
 
 // Implemente a Busca em Profundidade (DFS) de forma recursiva
-/*
+
 void buscaProfundidade(int vertice_atual, int destino) {
     // 1. Marque o vertice_atual como visitado (true).
+    visitados[vertice_atual] = true;
     // 2. Imprima o vertice_atual.
+    printf("%d ", vertice_atual);
     // 3. Verifique se vertice_atual == destino. Se sim, achou!
+    if (vertice_atual == destino){
+        printf("\n Destino %d alcancado!\n", destino);
+        return;
+    }
     // 4. Faça um 'for' percorrendo os vizinhos. Se houver aresta e não estiver visitado, chame a buscaProfundidade recursivamente.
+    for (int vizinho = 0; vizinho < num_vertices; vizinho++){
+        if (grafo[vertice_atual][vizinho] > 0 && !visitados[vizinho]){
+            buscaProfundidade(vizinho, destino);
+            if (visitados[destino]){
+                return;
+            }
+        }
+    }
+
 }
-*/
+
 
 
 // ====================================================================
 // NÍVEL MESTRE: O Caminho Mínimo (Dijkstra)
 // ====================================================================
 
-/*
+
 void dijkstra(int origem, int destino) {
     int distancias[MAX_VERTICES];
     int antecessores[MAX_VERTICES];
     bool processados[MAX_VERTICES];
 
     // 1. Inicialização: Defina todas as distâncias como INFINITO e processados como false.
+    for (int i = 0; i < num_vertices; i++){
+    	distancias[i] = INFINITO;
+    	antecessores[i] = -1;
+    	processados[i] = false;
+	}
     // 2. A distância da origem para ela mesma é 0 (distancias[origem] = 0).
+    distancias[origem] = 0;
 
     // 3. Loop principal para encontrar o vértice com menor distância não processado.
+    for (int i = 0; i < num_vertices - 1; i++){
+    	int menor_distancia = INFINITO;
+    	int u = -1;
+    	
+    	for (int v = 0; v < num_vertices; v++){
+    		if (!processados[v] && distancias[v] < menor_distancia){
+    			menor_distancia = distancias[v];
+    			u = v;
+			}
+		}
+		if (u == -1) break;
+		
+		processados[u] = true;
+	
     
-    // 4. Relaxamento: Atualize as distâncias dos vizinhos do vértice escolhido.
-    //    Se (distancia_atual + peso_aresta < distancia_conhecida_do_vizinho), atualize!
-    //    Não se esqueça de salvar o antecessor.
-
+    	// 4. Relaxamento: Atualize as distâncias dos vizinhos do vértice escolhido.
+    	//    Se (distancia_atual + peso_aresta < distancia_conhecida_do_vizinho), atualize!
+    	//    Não se esqueça de salvar o antecessor.
+    	for (int v = 0; v < num_vertices; v++){
+    		if (grafo[u][v] != INFINITO && grafo[u][v] > 0 && !processados[v]){
+    			if (distancias[u] + grafo[u][v] < distancias[v]){
+    				distancias[v] = distancias[u] + grafo[u][v];
+    				antecessores[v] = u;
+				}
+			}
+		}
+	}
     // 5. No final, use o vetor de antecessores, partindo do destino, para imprimir o caminho reverso até a origem.
     //    Mostre também a distancias[destino] como o custo total.
+    if (distancias[destino] == INFINITO){
+    	printf("Não existe caminho entre %d e %d.\n", origem, destino);
+    	return;
+	}
+	
+	printf("Distancia total: %d\n", distancias[destino]);
+	
+	int caminho[MAX_VERTICES];
+	int tam_caminho = 0;
+	int atual = destino;
+	
+	while (atual != -1){
+		caminho[tam_caminho++] = atual;
+		atual = antecessores[atual];
+	}
+	
+	printf("Caminho percorrido: ");
+	for (int i = tam_caminho - 1; i >= 0; i--){
+		printf("%d", caminho[i]);
+		if (i > 0) printf(" -> ");
+	}
+	printf("\n");
 }
-*/
+
 
 // ====================================================================
 // FUNÇÃO PRINCIPAL
@@ -125,20 +196,20 @@ int main() {
     // ---------------------------------------------------------
     // ÁREA DO NÍVEL AVENTUREIRO
     // ---------------------------------------------------------
-    /*
+    
     printf("\n--- Buscando Rota (DFS) ---\n");
     inicializarVisitados();
-    // buscaProfundidade(0, 5); // Exemplo: Buscar do 0 ao 5
-    */
+    buscaProfundidade(0, 5); // Exemplo: Buscar do 0 ao 5
+    
 
     // ---------------------------------------------------------
     // ÁREA DO NÍVEL MESTRE
     // ---------------------------------------------------------
-    /*
+    
     printf("\n--- Calculando Rota Mais Rapida (Dijkstra) ---\n");
     // Lembre-se de alterar as inserções do Nível Novato para incluir o Peso (distância real).
-    // dijkstra(0, 5); // Exemplo: Menor caminho do 0 ao 5
-    */
+    dijkstra(0, 5); // Exemplo: Menor caminho do 0 ao 5
+    
 
     return 0;
 }
